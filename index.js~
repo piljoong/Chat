@@ -11,7 +11,7 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
   console.log('a user connected');
   client.lrange('chats', 0, -1, function(err, reply) {
-      io.emit('history',reply)
+      io.emit('chat message',reply)
   });
   socket.on('chat message', function(msg){
     client.rpush(['chats',msg], function(err, reply) {
