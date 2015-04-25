@@ -5,7 +5,7 @@ var redis = require('redis');
 var client = redis.createClient(); //creates a new client
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(__dirname + '/index.html'); 
 });
 
 io.on('connection', function(socket){

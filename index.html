@@ -6,19 +6,40 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
       form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; border-radius: 10px; }
+      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; border-radius: 10px; }
+      #messages { list-style-type: none; margin: 0; padding: 0; overflow-y: scroll; overflow-x: hidden;}
+      #messages li { padding: 5px 10px; margin-top: 5px; margin-bottom: 5px;}
+      .self {
+	background: #ccccff;
+	float: right;
+	width: 51%;
+	border-radius: 10px;
+	
+      }
+
+	.def {
+		background: #ccffcc;
+		float: left;
+		width: 51%;
+		border-radius: 10px;
+	}
     </style>
-  <!--  <script>
-  	alert("Hello");
-    </script> -->
+    <script>
+    var person='undefined';
+    function myFunction() {
+	while(person=='undefined') {
+	    	person = prompt("Please enter your name");
+	}
+	$('#messages').height($(document).height() - 45);
+    }
+    </script>
   </head>
   <body onload="myFunction()">
+	<div id="divload"> Loading... </div>
     <ul id="messages"></ul>
     <form action="">
+	<!--<input type="hidden" id="personInp" name="person" value="" />-->
       <input id="m" autocomplete="off" /><button>Send</button>
     </form>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
@@ -27,31 +48,36 @@
 	var socket = io();
 	var flag = false;
 	$('form').submit(function(){
-	    	socket.emit('chat message', $('#m').val());
+	    	socket.emit('chat message', person+":"+$('#m').val());
 	    	$('#m').val('');
 	    	return false;
 	});
-  	socket.on('chat message', function(msg){
-	    	$('#messages').append($('<li>').text(msg));
-  	});
-	socket.on('history',function(msg){
-		if(!flag)
-		{
-			for(i=0;i<msg.length;i++)
-				$('#messages').append($('<li>').text(msg[i]));
+  	socket.on('chat message', handleMessage);
+	socket.on('history',function(msg) { setTimeout(historyHandler, 1000, msg);});
+
+	function handleMessage(msg){
+		var msgclass = 'def';
+		if(person == msg.substr(0, person.length)){
+			msgclass = 'self';
+		}
+	    	$('#messages').append($('<li class="' + msgclass + '">').text(msg));
+		var objDiv = document.getElementById("messages");
+		objDiv.scrollTop = objDiv.scrollHeight;
+  	}
+
+	function historyHandler(msg){
+		if(person == 'undefined') {
+			setTimeout(historyHandler, 100, msg);
+			return;
+		}
+		document.getElementById('divload').style.display = 'none';
+		if(!flag){
+			for(i=0;i<msg.length;i++) {
+				handleMessage(msg[i]);
+			}
 			flag = true;
 		}
-	});
-</script>
-<script>
-
-function myFunction() {
-
-    var person = prompt("Please enter your name");	
-	if(person!=null)
-	alert(person);
-
-}
-</script>
+	}
+    </script>
   </body>
 </html>
