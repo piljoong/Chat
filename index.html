@@ -26,12 +26,13 @@
 	}
     </style>
     <script>
-    var person='undefined';
+    // Function of Javascript to capture user's Nickname
+    var person='undefined';		// Global variable so that it can be used later
     function myFunction() {
 	while(person=='undefined') {
 	    	person = prompt("Please enter your name");
 	}
-	$('#messages').height($(document).height() - 45);
+	$('#messages').height($(document).height() - 45);	//Positioning incoming messages
     }
     </script>
   </head>
@@ -39,41 +40,42 @@
 	<div id="divload"> Loading... </div>
     <ul id="messages"></ul>
     <form action="">
-	<!--<input type="hidden" id="personInp" name="person" value="" />-->
-      <input id="m" autocomplete="off" /><button>Send</button>
+	<input id="m" autocomplete="off" /><button>Send</button>
     </form>
     <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
+	// Client based UI handling JS which also emits messages to server and receives it.
 	var socket = io();
 	var flag = false;
+	// Method for selecting the message typed by user and then sending it back to server
 	$('form').submit(function(){
-	    	socket.emit('chat message', person+":"+$('#m').val());
+	    	socket.emit('chat message', person+":"+$('#m').val());	// Sending nickname alongwith message
 	    	$('#m').val('');
 	    	return false;
 	});
-  	socket.on('chat message', handleMessage);
-	socket.on('history',function(msg) { setTimeout(historyHandler, 1000, msg);});
+  	socket.on('chat message', handleMessage);			// This event is interrupted when server emits messages
+	socket.on('history',function(msg) { setTimeout(historyHandler, 1000, msg);}); //Loading previously stored messages from server
 
-	function handleMessage(msg){
-		var msgclass = 'def';
-		if(person == msg.substr(0, person.length)){
+	function handleMessage(msg){				// Handler for incoming messages
+		var msgclass = 'def';				// default styling of messages
+		if(person == msg.substr(0, person.length)){	// If this message was sent by same user then assign self styling
 			msgclass = 'self';
 		}
-	    	$('#messages').append($('<li class="' + msgclass + '">').text(msg));
+	    	$('#messages').append($('<li class="' + msgclass + '">').text(msg)); // Adding message to text area
 		var objDiv = document.getElementById("messages");
-		objDiv.scrollTop = objDiv.scrollHeight;
+		objDiv.scrollTop = objDiv.scrollHeight;		// Scrolling the browser tab to new messages
   	}
 
-	function historyHandler(msg){
-		if(person == 'undefined') {
+	function historyHandler(msg){				// Function handler for previously recorded messages
+		if(person == 'undefined') {			// To ensure person has entered Nickname
 			setTimeout(historyHandler, 100, msg);
 			return;
 		}
-		document.getElementById('divload').style.display = 'none';
+		document.getElementById('divload').style.display = 'none';	
 		if(!flag){
 			for(i=0;i<msg.length;i++) {
-				handleMessage(msg[i]);
+				handleMessage(msg[i]);		// Handling the history messages as normal received messages
 			}
 			flag = true;
 		}
