@@ -24,6 +24,6 @@ io.on('connection', function(socket){		// Event handler for each user connect
   });
 });
 
-http.listen(3000, function(){			// Starting http server on port 3000
-  console.log('listening on *:3000');
+http.listen(80, function(){			// Starting http server on port 80
+  console.log('listening on *:80');
 });
