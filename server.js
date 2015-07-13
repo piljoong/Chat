@@ -8,6 +8,10 @@ app.get('/', function(req, res){
   res.sendFile(__dirname + '/index.html'); 	// On request from browser send index.html
 });
 
+app.get('/index.html', function(req, res){
+  res.sendFile(__dirname + '/index.html'); 	// On request from browser send index.html
+});
+
 io.on('connection', function(socket){		// Event handler for each user connect
   console.log('a user connected');
   client.lrange('chats', 0, -1, function(err, reply) {	// Push all the previously recorded messages from redis into browser
